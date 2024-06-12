@@ -1,0 +1,17 @@
+// generic.proto
+syntax = "proto3";
+
+message TripUpdate {
+  repeated TripDescriptor trip = 1;
+  repeated StopTimeUpdate stop_time_update = 2;
+}
+
+message TripDescriptor {
+  string trip_id = 1;
+  string route_id = 2;
+}
+
+message StopTimeUpdate {
+  string stop_id = 1;
+  int32 arrival_time = 2;
+}
