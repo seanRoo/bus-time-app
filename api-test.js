@@ -63,28 +63,29 @@ app.get("/proxy", async (req, res) => {
 });
 
 const getStopUpdates = (stopId, data) => {
-  return JSON.parse(data)
+  const flatten = JSON.parse(data)
     .entity.filter((entity) => entity.tripUpdate)
-    .flatMap((entity) =>
-      entity.tripUpdate.stopTimeUpdate
-        .filter((stopTimeUpdate) => stopTimeUpdate.stopId === stopId)
-        .map(
-          (stopTimeUpdate) => {
-            return formatDistanceToNow(
-              new Date(stopTimeUpdate.departure.time * 1000),
-              {
-                addSuffix: true,
-              }
-            );
-          }
-          // formatDistanceToNow(date, { addSuffix: true });
-          // tripId: entity.tripUpdate.trip.tripId,
-          // routeId: entity.tripUpdate.trip.routeId,
-          // arrival: stopTimeUpdate.arrival,
-          // departure: stopTimeUpdate.departure,
-          // delay: stopTimeUpdate.arrival.delay,
-        )
-    );
+    .flatMap((entity) => entity.tripUpdate.stopTimeUpdate)
+    .filter((stopTimeUpdate) => stopTimeUpdate.stopId === stopId);
+
+  return flatten
+    .sort((a, b) => a.departure.time - b.departure.time)
+    .map((stopTimeUpdate) => {
+      return formatDistanceToNow(
+        new Date(stopTimeUpdate.departure.time * 1000),
+        {
+          addSuffix: true,
+        }
+      );
+    });
+
+  // tripId: entity.tripUpdate.trip.tripId,
+  // routeId: entity.tripUpdate.trip.routeId,
+  // arrival: stopTimeUpdate.arrival,
+  // departure: stopTimeUpdate.departure,
+  // delay: stopTimeUpdate.arrival.delay,
+  //)
+  // );
 };
 
 app.get("/realtime", async (req, res) => {
