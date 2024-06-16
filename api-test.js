@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 import protobuf from "protobufjs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, isPast } from "date-fns";
 
 // Define __filename and __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -71,12 +71,14 @@ const getStopUpdates = (stopId, data) => {
   return flatten
     .sort((a, b) => a.departure.time - b.departure.time)
     .map((stopTimeUpdate) => {
-      return formatDistanceToNow(
-        new Date(stopTimeUpdate.departure.time * 1000),
-        {
-          addSuffix: true,
-        }
-      );
+      if (!isPast(stopTimeUpdate)) {
+        return formatDistanceToNow(
+          new Date(stopTimeUpdate.departure.time * 1000),
+          {
+            addSuffix: true,
+          }
+        );
+      }
     });
 
   // tripId: entity.tripUpdate.trip.tripId,
@@ -110,8 +112,6 @@ app.get("/realtime", async (req, res) => {
     const resJson = JSON.stringify(object, null, 2);
 
     res.send(getStopUpdates(STOP_NUMBER, resJson));
-
-    //res.send(JSON.stringify(getStopUpdates(STOP_NUMBER, resJson)));
   } catch (error) {
     console.error("Fetch error:", error);
     res.status(500).send(`Error fetching data: ${error.message}`);
