@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import fetch from "node-fetch";
 import protobuf from "protobufjs";
@@ -10,16 +11,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-
-const API_KEY = "aFnxVF9zO55k9Rh58Buh";
 const STOP_NUMBER = "51";
 
-const API_URL = "https://metrolink-gtfsrt.gbsdigital.us/feed/gtfsrt-trips";
-const REALTIME = `https://gtfsapi.translink.ca/v3/gtfsrealtime?apikey=${API_KEY}`;
+const API_KEY = process.env.API_KEY;
+
+const TEST_API_URL = "https://metrolink-gtfsrt.gbsdigital.us/feed/gtfsrt-trips";
+const REALTIME_URL = `https://gtfsapi.translink.ca/v3/gtfsrealtime?apikey=${API_KEY}`;
 
 app.get("/proxy", async (req, res) => {
   try {
-    const response = await fetch(API_URL, {
+    const response = await fetch(TEST_API_URL, {
       method: "GET",
       headers: {
         "Content-Type": "application/x-google-protobuf",
@@ -80,19 +81,11 @@ const getStopUpdates = (stopId, data) => {
         );
       }
     });
-
-  // tripId: entity.tripUpdate.trip.tripId,
-  // routeId: entity.tripUpdate.trip.routeId,
-  // arrival: stopTimeUpdate.arrival,
-  // departure: stopTimeUpdate.departure,
-  // delay: stopTimeUpdate.arrival.delay,
-  //)
-  // );
 };
 
 app.get("/realtime", async (req, res) => {
   try {
-    const response = await fetch(REALTIME);
+    const response = await fetch(REALTIME_URL);
 
     if (!response.ok) {
       throw new Error(`Network response was not ok: ${response.statusText}`);
