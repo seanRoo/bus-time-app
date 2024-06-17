@@ -95,9 +95,9 @@ app.get("/realtime", async (req, res) => {
     const FeedMessage = root.lookupType("transit_realtime.FeedMessage");
     const message = FeedMessage.decode(new Uint8Array(buffer));
     const object = FeedMessage.toObject(message, {
-      longs: String,
-      enums: String,
-      bytes: String,
+      longs,
+      enums,
+      bytes,
     });
 
     res.setHeader("Content-Type", "application/json");
